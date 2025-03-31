@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:task_manager/services/task_service.dart';
 import '../providers/task_provider.dart';
 import '../widgets/task_tile.dart';
@@ -57,9 +58,29 @@ class TaskListScreenState extends ConsumerState<TaskListScreen> {
     );
 
     ref.read(taskProvider.notifier).fetchTasks(refresh: true);
-    ref
-        .read(taskProvider.notifier)
-        .fetchRecommendedTasks();
+    ref.read(taskProvider.notifier).fetchRecommendedTasks();
+  }
+
+  Widget buildShimmerLoading() {
+    return ListView.builder(
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -78,80 +99,84 @@ class TaskListScreenState extends ConsumerState<TaskListScreen> {
 
     return RefreshIndicator(
       onRefresh: _refreshTasks,
-      child: ListView(
-        controller: _scrollController,
-        children: [
-          // Display the regular tasks section
-          if (sortedTasks.isEmpty)
-            const Center(
-              child: Text(
-                "No pending tasks",
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-            )
-          else
-            Column(
-              children:
-                  sortedTasks
-                      .map(
-                        (task) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: TaskTile(task),
-                        ),
-                      )
-                      .toList(),
-            ),
-
-          // Display the recommended tasks section at the bottom
-          if (limitedRecommendedTasks.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child:
+          tasks.isEmpty
+              ? buildShimmerLoading()
+              : ListView(
+                controller: _scrollController,
                 children: [
-                  Text(
-                    'Recommended Tasks',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  ...limitedRecommendedTasks.map(
-                    (task) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Card(
-                        elevation: 4,
-                        color: Colors.grey.shade200,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 6.0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TaskTile(task),
-                              const SizedBox(height: 8),
-                              ElevatedButton(
-                                onPressed: () {
-                                  _addTaskToList(task);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.blueGrey,
+                  // Display the regular tasks section
+                  if (sortedTasks.isEmpty)
+                    const Center(
+                      child: Text(
+                        "No pending tasks",
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                    )
+                  else
+                    Column(
+                      children:
+                          sortedTasks
+                              .map(
+                                (task) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: TaskTile(task),
                                 ),
-                                child: const Text('Add Task'),
-                              ),
-                            ],
+                              )
+                              .toList(),
+                    ),
+
+                  // Display the recommended tasks section at the bottom
+                  if (limitedRecommendedTasks.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Recommended Tasks',
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          ...limitedRecommendedTasks.map(
+                            (task) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Card(
+                                elevation: 4,
+                                color: Colors.grey.shade200,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                    horizontal: 6.0,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TaskTile(task),
+                                      const SizedBox(height: 8),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _addTaskToList(task);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors.blueGrey,
+                                        ),
+                                        child: const Text('Add Task'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
                 ],
               ),
-            ),
-        ],
-      ),
     );
   }
 }
