@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:task_manager/main.dart';
 import 'package:task_manager/screens/completed_task_screen.dart';
 import 'package:task_manager/screens/create_task_screen.dart';
 import 'package:task_manager/screens/task_list_screen.dart';
@@ -24,6 +25,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = ref.watch(darkModeProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: FutureBuilder<String?>(
@@ -55,6 +58,22 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      enabled: false,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Dark Mode"),
+                          Switch(
+                            value: isDarkMode,
+                            onChanged: (value) {
+                              Navigator.of(context).pop();
+                              ref.read(darkModeProvider.notifier).state = value;
+                            },
                           ),
                         ],
                       ),
