@@ -23,6 +23,7 @@ export default async function handler(req: any, res: any) {
         .from("tasks")
         .select("*")
         .eq("user_id", user.id)
+        .eq("status", "completed")
         .order("due_date", { ascending: false })
         .limit(5);
 
