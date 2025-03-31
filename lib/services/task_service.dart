@@ -5,8 +5,7 @@ import 'package:task_manager/providers/task_provider.dart';
 class TaskService {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  /// **Add Task**
-  /// Adds a new task to the Supabase database.
+  // Add Task
   Future<void> addTask(
     String title,
     String description,
@@ -42,6 +41,7 @@ class TaskService {
     }
   }
 
+  // Update Task
   Future<void> updateTask(
     String taskId,
     String title,
@@ -78,6 +78,7 @@ class TaskService {
     }
   }
 
+  // Delete Task
   Future<void> deleteTask(String taskId) async {
     try {
       final user = supabase.auth.currentUser;

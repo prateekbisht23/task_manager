@@ -38,7 +38,7 @@ class TaskTileState extends ConsumerState<TaskTile> {
     String newStatus = value ? 'completed' : 'pending';
 
     setState(() {
-      status = newStatus; // Instantly update UI
+      status = newStatus;
     });
 
     await TaskService().updateTask(
@@ -52,7 +52,6 @@ class TaskTileState extends ConsumerState<TaskTile> {
 
     if (!mounted) return;
 
-    // Refresh the correct task list
     ref.read(taskProvider.notifier).fetchTasks(refresh: true);
     ref.read(completedTaskProvider.notifier).fetchTasks(refresh: true);
   }
@@ -70,7 +69,6 @@ class TaskTileState extends ConsumerState<TaskTile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title & Checkbox
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,7 +88,6 @@ class TaskTileState extends ConsumerState<TaskTile> {
             ),
             const SizedBox(height: 4),
 
-            // Description
             Text(
               widget.task['description'],
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
@@ -99,7 +96,6 @@ class TaskTileState extends ConsumerState<TaskTile> {
             ),
             const SizedBox(height: 8),
 
-            // Due Date
             Row(
               children: [
                 const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
@@ -116,7 +112,6 @@ class TaskTileState extends ConsumerState<TaskTile> {
             ),
             const SizedBox(height: 8),
 
-            // Priority & Status Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

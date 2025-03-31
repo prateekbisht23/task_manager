@@ -55,7 +55,6 @@ class EditTaskScreenState extends ConsumerState<EditTaskScreen> {
 
     if (!mounted) return;
 
-    // Instead of just invalidating, explicitly fetch updated tasks
     await ref.read(taskProvider.notifier).fetchTasks(refresh: true);
     await ref.read(completedTaskProvider.notifier).fetchTasks(refresh: true);
 

@@ -112,13 +112,12 @@ class CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
                       ref,
                     );
 
-                    // ✅ Clear input fields after successful task creation
                     titleController.clear();
                     descController.clear();
                     setState(() {
-                      priority = 'medium'; // Reset priority to default
-                      dueDate = null; // Reset date picker
-                      status = 'pending'; // Reset status
+                      priority = 'medium';
+                      dueDate = null;
+                      status = 'pending';
                     });
 
                     

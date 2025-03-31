@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 final taskProvider =
     StateNotifierProvider<TaskNotifier, List<Map<String, dynamic>>>((ref) {
@@ -19,6 +21,10 @@ class TaskNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   bool _isFetching = false;
   int _page = 0;
   final bool isCompleted;
+
+  // URL to the Supabase Edge function for recommendations
+  final String supabaseFunctionUrl =
+      "http://127.0.0.1:54321/functions/v1/getTaskRecommendations";
 
   Future<void> fetchTasks({bool refresh = false}) async {
     final user = supabase.auth.currentUser;
@@ -45,6 +51,48 @@ class TaskNotifier extends StateNotifier<List<Map<String, dynamic>>> {
       if (response.isNotEmpty) {
         state = refresh ? response : [...state, ...response];
         _page++;
+      }
+    } catch (e) {
+      return;
+    } finally {
+      _isFetching = false;
+    }
+  }
+
+  // Method to fetch recommended tasks
+  Future<void> fetchRecommendedTasks() async {
+    final user = supabase.auth.currentUser;
+    if (_isFetching || user == null) return;
+
+    _isFetching = true;
+
+    try {
+      final session = supabase.auth.currentSession;
+      final authToken = session?.accessToken ?? '';
+
+      if (authToken.isEmpty) {
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse(supabaseFunctionUrl),
+        headers: {
+          "Authorization": "Bearer $authToken",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final recommendations = data['recommendations'] ?? [];
+
+        if (recommendations.isNotEmpty) {
+          state = [...state, ...recommendations];
+        } else {
+          return;
+        }
+      } else {
+        return;
       }
     } catch (e) {
       return;

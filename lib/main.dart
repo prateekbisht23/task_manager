@@ -6,6 +6,9 @@ import 'package:task_manager/screens/landing_page.dart';
 import 'package:task_manager/screens/auth_screen.dart';
 import 'package:task_manager/screens/home_screen.dart';
 
+// Dark mode provider
+final darkModeProvider = StateProvider<bool>((ref) => false);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -26,17 +29,21 @@ Future<bool> isUserLoggedIn() async {
   return prefs.containsKey('auth_token');
 }
 
-class TaskManagerApp extends StatelessWidget {
+class TaskManagerApp extends ConsumerWidget {
   final String initialRoute;
 
   const TaskManagerApp({super.key, required this.initialRoute});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDarkMode = ref.watch(darkModeProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Task Manager',
       theme: ThemeData(primarySwatch: Colors.blue),
+      darkTheme: ThemeData.dark(),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       initialRoute: initialRoute,
       routes: {
         '/': (context) => LandingPage(),
